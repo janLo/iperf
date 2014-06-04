@@ -166,6 +166,7 @@ struct iperf_test
     signed char state;
     char     *server_hostname;                  /* -c option */
     char     *bind_address;                     /* -B option */
+    char     *control_address;                  /* -K option */
     int       server_port;
     int       omit;                             /* duration of omit period (-O flag) */
     int       duration;                         /* total duration of test (-t flag) */

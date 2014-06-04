@@ -49,8 +49,9 @@
 int
 iperf_server_listen(struct iperf_test *test)
 {
+    char * addr = (test->control_address == NULL ? test->bind_address : test->control_address);
     retry:
-    if((test->listener = netannounce(test->settings->domain, Ptcp, test->bind_address, test->server_port)) < 0) {
+    if((test->listener = netannounce(test->settings->domain, Ptcp, addr, test->server_port)) < 0) {
 	if (errno == EAFNOSUPPORT && (test->settings->domain == AF_INET6 || test->settings->domain == AF_UNSPEC)) {
 	    /* If we get "Address family not supported by protocol", that
 	    ** probably means we were compiled with IPv6 but the running

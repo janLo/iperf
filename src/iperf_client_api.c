@@ -267,8 +267,12 @@ iperf_connect(struct iperf_test *test)
     make_cookie(test->cookie);
 
     /* Create and connect the control channel */
-    if (test->ctrl_sck < 0)
-	test->ctrl_sck = netdial(test->settings->domain, Ptcp, test->bind_address, test->server_hostname, test->server_port);
+    if (test->ctrl_sck < 0) {
+        if (test->control_address)
+            test->ctrl_sck = netdial(test->settings->domain, Ptcp, NULL, test->control_address, test->server_port);
+        else
+            test->ctrl_sck = netdial(test->settings->domain, Ptcp, test->bind_address, test->server_hostname, test->server_port);
+    }
     if (test->ctrl_sck < 0) {
         i_errno = IECONNECT;
         return -1;

@@ -553,6 +553,7 @@ iperf_parse_arguments(struct iperf_test *test, int argc, char **argv)
         {"version4", no_argument, NULL, '4'},
         {"version6", no_argument, NULL, '6'},
         {"tos", required_argument, NULL, 'S'},
+        {"control", required_argument, NULL, 'K'},
 #if defined(HAVE_FLOWLABEL)
         {"flowlabel", required_argument, NULL, 'L'},
 #endif /* HAVE_FLOWLABEL */
@@ -586,7 +587,7 @@ iperf_parse_arguments(struct iperf_test *test, int argc, char **argv)
 
     blksize = 0;
     server_flag = client_flag = rate_flag = duration_flag = 0;
-    while ((flag = getopt_long(argc, argv, "p:f:i:DVJvsc:ub:t:n:k:l:P:Rw:B:M:N46S:L:ZO:F:A:T:C:dI:h", longopts, NULL)) != -1) {
+    while ((flag = getopt_long(argc, argv, "p:f:i:DVJvsc:ub:t:n:k:l:P:Rw:B:M:N46S:K:L:ZO:F:A:T:C:dI:h", longopts, NULL)) != -1) {
         switch (flag) {
             case 'p':
                 test->server_port = atoi(optarg);
@@ -728,6 +729,10 @@ iperf_parse_arguments(struct iperf_test *test, int argc, char **argv)
             case 'S':
                 test->settings->tos = strtol(optarg, NULL, 0);
 		client_flag = 1;
+                break;
+            case 'K':
+                // XXX Jan
+                test->control_address = strdup(optarg);
                 break;
             case 'L':
 #if defined(HAVE_FLOWLABEL)
@@ -1674,6 +1679,8 @@ iperf_free_test(struct iperf_test *test)
 	free(test->server_hostname);
     if (test->bind_address)
 	free(test->bind_address);
+    if (test->control_address)
+        free(test->control_address);
     free(test->settings);
     if (test->title)
 	free(test->title);
@@ -1762,6 +1769,10 @@ iperf_reset_test(struct iperf_test *test)
     if(test->bind_address) {
         free(test->bind_address);
         test->bind_address = NULL;
+    }
+    if(test->control_address) {
+        free(test->control_address);
+        test->control_address = NULL;
     }
     if(test->congestion) {
         free(test->congestion);
